@@ -1,6 +1,12 @@
 FROM node:18-alpine AS base
 
 FROM base AS deps
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
+    apk add --no-cache openrc tzdata && \
+    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \ 
+    echo "Asia/Shanghai" > /etc/timezone && \
+    apk del tzdata && \
+    rm -rf /var/cache/apk/* 
 RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
@@ -31,6 +37,13 @@ COPY . .
 RUN yarn build
 
 FROM base AS runner
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
+    apk add --no-cache openrc tzdata && \
+    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \ 
+    echo "Asia/Shanghai" > /etc/timezone && \
+    apk del tzdata && \
+    rm -rf /var/cache/apk/* 
+    
 WORKDIR /app
 
 RUN apk add proxychains-ng
